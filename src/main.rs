@@ -128,7 +128,9 @@ fn main() -> Result<(), anyhow::Error> {
             // TODO: config files?
             let mut ctx = LinuxCtx::new();
 
-            wasm_embedded_rt::wasm3::run(&mut ctx, &bin)?;
+            let mut rt = wasm_embedded_rt::wasm3::Wasm3Runtime::new(&bin)?;
+            rt.bind_all(&mut ctx)?;
+            rt.run()?;
         },
         _ => {
             return Err(anyhow::anyhow!("Runtime was not built with {}:{} features", opts.runtime, opts.mode))
