@@ -1681,9 +1681,9 @@ dependencies = [
 
 [[package]]
 name = "wasm-embedded-spec"
-version = "0.2.1"
+version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c2631f9b8637e372d2f0b46f67abbd9c82dd2da45ec55be809dab84cedbefe8c"
+checksum = "8395e7e7b001f2688c50bcd0c0f3df7b23cf623545035a83ac761c64aa0740e6"
 dependencies = [
  "bindgen",
  "cty",
