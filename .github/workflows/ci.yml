@@ -31,6 +31,8 @@ jobs:
 
           - target: x86_64-apple-darwin
             os: macos-latest
+            opts: --no-default-features --features=rt,rt-wasm3,rt-wasmtime,hal-mock
+            ext: .exe
             archive: tgz
 
           - target: armv7-unknown-linux-gnueabihf
@@ -77,13 +79,6 @@ jobs:
     - name: Install cross toolchain (aarch64)
       if: ${{ matrix.target == 'aarch64-unknown-linux-gnu' }}
       run: sudo apt install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
-
-    - name: Install deps (foreign architecture)
-      if: ${{ matrix.apt-arch }}
-      uses: ryankurte/action-apt@v0.3.0
-      with:
-        arch: ${{ matrix.apt-arch }}
-        packages: libsdl2-dev:${{ matrix.apt-arch }}
 
     - name: Build Runtime
       uses: actions-rs/cargo@v1
