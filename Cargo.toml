@@ -26,9 +26,9 @@ wasm-embedded-spec = { version = "0.2.0", default_features = false }
 
 
 # rt-wasmtime
-wiggle = { version = "0.31.0", optional = true }
-wasmtime = { version = "0.31.0", optional = true }
-wasmtime-wasi = { version = "0.31.0", optional = true }
+wiggle = { version = "0.32.0", optional = true }
+wasmtime = { version = "0.32.0", optional = true }
+wasmtime-wasi = { version = "0.32.0", optional = true }
 
 # rt-wasm3
 wasm-embedded-rt-wasm3 = { version = "0.2.0", optional = true }
@@ -63,3 +63,4 @@ required-features = [ "rt" ]
 [patch.crates-io]
 #wasm-embedded-spec = { path = "../spec" }
 #wasm-embedded-rt-wasm3 = { path = "../rt_wasm3" }
+
