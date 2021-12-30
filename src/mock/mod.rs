@@ -148,9 +148,9 @@ impl Drop for MockCtx {
     }
 }
 
-#[cfg(feature = "wiggle")]
-impl crate::api::spi::UserErrorConversion for MockCtx {
-    fn errno_from_error(&mut self, _e: crate::api::Error) -> Result<crate::api::types::Errno, wiggle::Trap> {
+#[cfg(feature = "rt-wasmtime")]
+impl wasm_embedded_spec::api::spi::UserErrorConversion for MockCtx {
+    fn errno_from_error(&mut self, _e: crate::api::Error) -> Result<wasm_embedded_spec::api::types::Errno, wiggle::Trap> {
         // TODO: convert errors here
         todo!()
     }
