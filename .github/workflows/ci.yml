@@ -93,17 +93,20 @@ jobs:
         name: rt-${{matrix.target}}
         path: target/${{ matrix.target }}/release/wasm-embedded-rt${{matrix.ext}}
 
+    - name: Copy release artifact
+      run: cp target/${{ matrix.target }}/release/wasm-embedded-rt${{matrix.ext}} wasm-embedded-rt${{matrix.ext}}
+
     - name: Create archive (tgz, linux)
       if: ${{ matrix.os != 'macos-latest' && matrix.os != 'windows-latest' }}
-      run: tar -czvf wasm-embedded-rt-${{ matrix.target }}.tgz ${{ matrix.output }}
+      run: tar -czvf wasm-embedded-rt-${{ matrix.target }}.tgz wasm-embedded-rt${{matrix.ext}}
     
     - name: Create archive (zip, windows)
       if: ${{ matrix.os == 'windows-latest' }}
-      run: tar.exe -a -c -f wasm-embedded-rt-${{ matrix.target }}.zip ${{ matrix.output }}
+      run: tar.exe -a -c -f wasm-embedded-rt-${{ matrix.target }}.zip wasm-embedded-rt${{matrix.ext}}
 
     - name: Create archive (zip, macos)
       if: ${{ matrix.os == 'macos-latest' }}
-      run: zip wasm-embedded-rt-${{ matrix.target }}.zip ${{ matrix.output }}
+      run: zip wasm-embedded-rt-${{ matrix.target }}.zip wasm-embedded-rt${{matrix.ext}}
 
     - name: Upload binary to release
       if: ${{ startsWith(github.ref, 'refs/tags/v') }}
