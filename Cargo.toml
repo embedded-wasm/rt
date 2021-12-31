@@ -3,7 +3,7 @@ name = "wasm-embedded-rt"
 description = "Runtime for embedded-wasm applications"
 repository = "https://github.com/embedded-wasm/rt"
 documentation = "https://ryan.kurte.nz/embedded-wasm"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2018"
 license = "MPL-2.0"
 
