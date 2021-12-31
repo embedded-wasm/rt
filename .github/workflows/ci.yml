@@ -32,7 +32,6 @@ jobs:
           - target: x86_64-apple-darwin
             os: macos-latest
             opts: --no-default-features --features=rt,rt-wasm3,rt-wasmtime,hal-mock
-            ext: .exe
             archive: tgz
 
           - target: armv7-unknown-linux-gnueabihf
@@ -59,12 +58,13 @@ jobs:
         override: true
         components: rustfmt, clippy
 
-    - name: Configure caching
+    - name: Setup caching
       uses: actions/cache@v2
       with:
         key: rt-${{ matrix.os }}-${{ matrix.target }}
         path: |
-          ${{ env.HOME }}/.cargo
+          ~/.cargo/registry
+          ~/.cargo/git
           target/${{ matrix.target }}
 
     - name: Install libclang for bindgen
