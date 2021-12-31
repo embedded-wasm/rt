@@ -1,5 +1,6 @@
 
 use structopt::StructOpt;
+use strum::VariantNames;
 use strum_macros::{Display, EnumString, EnumVariantNames};
 use log::{LevelFilter, debug};
 
@@ -12,14 +13,14 @@ use wasm_embedded_rt::linux::LinuxCtx;
 #[derive(Clone, PartialEq, Debug, StructOpt)]
 struct Options {
     /// Operating mode
-    #[structopt(long, default_value="dynamic")]
+    #[structopt(long, default_value, possible_values=&Mode::VARIANTS)]
     mode: Mode,
 
     /// Runtime
-    #[structopt(long, default_value="wasmtime")]
+    #[structopt(long, default_value, possible_values=&Runtime::VARIANTS)]
     runtime: Runtime,
 
-    /// Configuration file (toml)
+    /// Optional configuration file
     #[structopt(long)]
     config: Option<String>,
 

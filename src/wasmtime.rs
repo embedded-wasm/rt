@@ -3,7 +3,7 @@
 // TODO: move this out to rt_wasmtime
 
 use wasm_embedded_spec::api::UserErrorConversion;
-use crate::api::{self, Engine};
+use crate::api::Engine;
 
 /// Run the provided application using the wasmtime runtime
 pub fn run<E: Engine + UserErrorConversion>(manager: E, bin: &[u8]) -> anyhow::Result<()> {
