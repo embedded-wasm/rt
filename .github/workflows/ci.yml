@@ -15,6 +15,9 @@ jobs:
     name: Build Runtime
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.experimental }}
+
+    defaults:
+      experimental: false
     
     strategy:
       fail-fast: false
