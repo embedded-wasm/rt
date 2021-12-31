@@ -17,7 +17,7 @@ rt-wasmtime = [ "wasmtime", "wasmtime-wasi", "wiggle", "std", "wasm-embedded-spe
 hal-linux = [ "linux-embedded-hal", "std" ]
 hal-mock = [ "embedded-hal-mock", "std", "serde", "serde_derive", "toml" ]
 
-default = [ "rt", "rt-wasmtime", "rt-wasm3", "hal-linux" ]
+default = [ "rt", "rt-wasmtime", "rt-wasm3", "hal-linux", "hal-mock" ]
 
 [dependencies]
 embedded-hal = "1.0.0-alpha.5"
