@@ -43,9 +43,9 @@ dependencies = [
 
 [[package]]
 name = "anyhow"
-version = "1.0.51"
+version = "1.0.52"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8b26702f315f53b6071259e15dd9d64528213b44d61de1ec926eca7715d62203"
+checksum = "84450d0b4a8bd1ba4144ce8ce718fbc5d071358b1e5384bace6536b3d1f2d5b3"
 
 [[package]]
 name = "async-trait"
@@ -1623,6 +1623,34 @@ dependencies = [
  "thiserror",
  "toml",
  "wasm-embedded-rt-wasm3",
+ "wasm-embedded-rt-wasmtime",
+ "wasm-embedded-spec",
+]
+
+[[package]]
+name = "wasm-embedded-rt-wasm3"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "19a434c2d0caac7637d111e2360a2c7b9b13a7c04f9419d5378034a4fea2cd31"
+dependencies = [
+ "bindgen",
+ "cmake",
+ "cty",
+ "embedded-hal 1.0.0-alpha.5",
+ "log",
+ "thiserror",
+ "wasm-embedded-spec",
+]
+
+[[package]]
+name = "wasm-embedded-rt-wasmtime"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5cc8ec020620511cbb89c6e03bb2fabafeccafec091e7ebd8a4636dab0b22450"
+dependencies = [
+ "anyhow",
+ "embedded-hal 1.0.0-alpha.5",
+ "log",
  "wasm-embedded-spec",
  "wasmtime",
  "wasmtime-wasi",
@@ -1630,22 +1658,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "wasm-embedded-rt-wasm3"
-version = "0.2.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "46bfdc231571c9ebbf4942a0ae57165b47273ce52b2fc73c874330fe2a83eef4"
-dependencies = [
- "bindgen",
- "cmake",
- "cty",
- "wasm-embedded-spec",
-]
-
-[[package]]
 name = "wasm-embedded-spec"
-version = "0.2.3"
+version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8c72b258a5877a983496baad0b19ae996dab81a988c4fdd76042402e53106cc7"
+checksum = "4b9980c4b90106d9ac205611d6f1b0505dc4cb33e0a16caf1e2499d14a1deb2a"
 dependencies = [
  "bindgen",
  "cty",

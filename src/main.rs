@@ -10,13 +10,20 @@ use wasm_embedded_rt::mock::MockCtx;
 #[cfg(feature="hal-linux")]
 use wasm_embedded_rt::linux::LinuxCtx;
 
+#[cfg(feature="rt-wasm3")]
+use wasm_embedded_rt_wasm3::{Wasm3Runtime};
+
+#[cfg(feature="rt-wasmtime")]
+use wasm_embedded_rt_wasmtime::{WasmtimeRuntime};
+
+
 #[derive(Clone, PartialEq, Debug, StructOpt)]
 struct Options {
-    /// Operating mode
-    #[structopt(long, default_value, possible_values=&Mode::VARIANTS)]
-    mode: Mode,
+    /// Backing engine
+    #[structopt(long, default_value, possible_values=&Engine::VARIANTS)]
+    engine: Engine,
 
-    /// Runtime
+    /// WASM Runtime
     #[structopt(long, default_value, possible_values=&Runtime::VARIANTS)]
     runtime: Runtime,
 
@@ -33,23 +40,25 @@ struct Options {
     pub log_level: LevelFilter,
 }
 
-/// Runtime mode
+/// Runtime engine
 #[derive(Clone, PartialEq, Debug, StructOpt)]
 #[derive(Display, EnumVariantNames, EnumString)]
 #[strum(serialize_all = "snake_case")]
 #[non_exhaustive]
-pub enum Mode {
+pub enum Engine {
+    /// Mock provides mocked driver testing
     Mock,
+    /// Linux provides linux-embedded-hal backed drivers
     Linux,
 }
 
-impl Default for Mode {
+impl Default for Engine {
     fn default() -> Self {
         #[cfg(feature="hal-linux")]
-        return Mode::Linux;
+        return Engine::Linux;
 
         #[cfg(not(feature="hal-linux"))]
-        return Mode::Mock;
+        return Engine::Mock;
     }
 }
 
@@ -58,7 +67,9 @@ impl Default for Mode {
 #[strum(serialize_all = "snake_case")]
 #[non_exhaustive]
 pub enum Runtime {
+    /// Wasmtime based runtime
     Wasmtime,
+    /// Wasm3 based runtime
     Wasm3,
 }
 
@@ -89,52 +100,53 @@ fn main() -> Result<(), anyhow::Error> {
     debug!("Loading WASM binary: {}", opts.bin);
     let bin = std::fs::read(opts.bin)?;
 
-
-    match (&opts.runtime, &opts.mode) {
+    #[allow(unreachable_patterns)]
+    match (&opts.runtime, &opts.engine) {
         #[cfg(all(feature="rt-wasmtime", feature="hal-mock"))]
-        (Runtime::Wasmtime, Mode::Mock) => {
+        (Runtime::Wasmtime, Engine::Mock) => {
             // Load mock configuration
             let cfg = match &opts.config {
                 Some(c) => c,
                 None => return Err(anyhow::anyhow!("mock mode requires --config file")),
             };
             let ctx = MockCtx::load(&cfg)?;
+            let mut rt = WasmtimeRuntime::new(ctx, &bin)?;
 
-            wasm_embedded_rt::wasmtime::run(ctx, &bin)?;
+            rt.run()?;
         },
         #[cfg(all(feature="rt-wasmtime", feature="hal-linux"))]
-        (Runtime::Wasmtime, Mode::Linux) => {
+        (Runtime::Wasmtime, Engine::Linux) => {
             // Load linux configuration
             // TODO: config files?
             let ctx = LinuxCtx::new();
+            let mut rt = WasmtimeRuntime::new(ctx, &bin)?;
 
-            wasm_embedded_rt::wasmtime::run(ctx, &bin)?;
+            rt.run()?;
         },
         #[cfg(all(feature="rt-wasm3", feature="hal-mock"))]
-        (Runtime::Wasm3, Mode::Mock) => {
+        (Runtime::Wasm3, Engine::Mock) => {
             // Load mock configuration
             let cfg = match &opts.config {
                 Some(c) => c,
                 None => return Err(anyhow::anyhow!("mock mode requires --config file")),
             };
             let mut ctx = MockCtx::load(&cfg)?;
+            let mut rt = Wasm3Runtime::new(&mut ctx, &bin)?;
             
-            let mut rt = wasm_embedded_rt::wasm3::Wasm3Runtime::new(&bin)?;
-            rt.bind_all(&mut ctx)?;
+            // TODO: bind drivers
+
             rt.run()?;
         },
         #[cfg(all(feature="rt-wasm3", feature="hal-linux"))]
-        (Runtime::Wasm3, Mode::Linux) => {
+        (Runtime::Wasm3, Engine::Linux) => {
             // Load linux configuration
             // TODO: config files?
             let mut ctx = LinuxCtx::new();
-
-            let mut rt = wasm_embedded_rt::wasm3::Wasm3Runtime::new(&bin)?;
-            rt.bind_all(&mut ctx)?;
+            let mut rt = Wasm3Runtime::new(&mut ctx, &bin)?;
             rt.run()?;
         },
         _ => {
-            return Err(anyhow::anyhow!("Runtime was not built with {}:{} features", opts.runtime, opts.mode))
+            return Err(anyhow::anyhow!("Runtime was not built with {}:{} enabled", opts.runtime, opts.engine))
         },
     }
 

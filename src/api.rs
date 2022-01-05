@@ -9,7 +9,7 @@ pub use wasm_embedded_spec::gpio::Gpio;
 pub use wasm_embedded_spec::Error;
 
 /// Engine trait combines API traits for convenience
-pub trait Engine: I2c + Spi + Gpio + 'static {
-    #[cfg(feature = "rt-wasmtime")]
-    fn wasi(&mut self) -> &mut wasmtime_wasi::WasiCtx { unimplemented!() }
-}
+pub trait Engine: I2c + Spi + Gpio + 'static {}
+
+impl <T> Engine for T where
+    T: I2c + Spi + Gpio + 'static {}

@@ -11,10 +11,10 @@ pub mod mock;
 pub mod linux;
 
 #[cfg(feature="rt-wasm3")]
-pub mod wasm3;
+pub use wasm_embedded_rt_wasm3::{self as rt_wasm3};
 
 #[cfg(feature="rt-wasmtime")]
-pub mod wasmtime;
+pub use wasm_embedded_rt_wasmtime::{self as rt_wasmtime};
 
 #[derive(Clone, PartialEq, Debug)]
 pub struct Config {

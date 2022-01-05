@@ -4,11 +4,6 @@ use std::{vec, vec::Vec};
 use serde::{Serialize, Deserialize};
 use log::debug;
 
-#[cfg(feature = "rt-wasmtime")]
-use wasmtime_wasi::{WasiCtx, sync::WasiCtxBuilder};
-
-use crate::api::{Engine};
-
 mod spi;
 mod i2c;
 mod gpio;
@@ -102,8 +97,6 @@ pub struct MockCtx {
     expected: Vec<Op>,
     actual: Vec<Kind>,
     index: usize,
-    #[cfg(feature = "rt-wasmtime")]
-    wasi: WasiCtx,
 }
 
 impl MockCtx {
@@ -117,27 +110,11 @@ impl MockCtx {
 
         debug!("Using expectations: {:?}", f);
 
-        // Setup WASI ctx
-        #[cfg(feature = "rt-wasmtime")]
-        let wasi = WasiCtxBuilder::new()
-            .inherit_stdio()
-            .inherit_args().unwrap()
-            .build();
-
         Ok(Self{
             expected: f.ops,
             actual: vec![],
             index: 0,
-            #[cfg(feature = "rt-wasmtime")]
-            wasi,
         })
-    }
-}
-
-impl Engine for MockCtx {
-    #[cfg(feature = "rt-wasmtime")]
-    fn wasi(&mut self) -> &mut WasiCtx { 
-        &mut self.wasi    
     }
 }
 
@@ -145,14 +122,6 @@ impl Drop for MockCtx {
     fn drop(&mut self) {
         let ex: Vec<Kind> = self.expected.iter().map(|v| v.kind.clone()).collect();
         assert_eq!(&ex, &self.actual, "Mock result mismatch");
-    }
-}
-
-#[cfg(feature = "rt-wasmtime")]
-impl wasm_embedded_spec::api::spi::UserErrorConversion for MockCtx {
-    fn errno_from_error(&mut self, _e: crate::api::Error) -> Result<wasm_embedded_spec::api::types::Errno, wiggle::Trap> {
-        // TODO: convert errors here
-        todo!()
     }
 }
 
