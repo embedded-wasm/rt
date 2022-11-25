@@ -64,8 +64,3 @@ linux-embedded-hal = { version = "0.4.0-alpha.1", optional = true }
 name = "wasm-embedded-rt"
 path = "src/main.rs"
 required-features = [ "rt" ]
-
-[patch.crates-io]
-#wasm-embedded-spec = { path = "../spec" }
-#wasm-embedded-rt-wasm3 = { path = "../rt_wasm3" }
-#wasm-embedded-rt-wasmtime = { path = "../rt_wasmtime" }
