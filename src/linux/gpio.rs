@@ -8,7 +8,7 @@ use super::*;
 
 impl Gpio for LinuxCtx {
     /// Initialise the provided GPIO pin in input or output mode
-    fn init(&mut self, _port: u32, pin: u32, output: bool) -> Result<i32, Error> {
+    fn init(&mut self, _port: i32, pin: i32, output: bool) -> Result<i32, Error> {
         
         debug!("GPIO init port: {} pin: {} output: {:?}", _port, pin, output);
 

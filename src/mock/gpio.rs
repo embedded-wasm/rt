@@ -5,7 +5,7 @@ use crate::api::{Gpio, Error};
 use super::{MockCtx, Op, Kind};
 
 impl Gpio for MockCtx {
-    fn init(&mut self, port: u32, pin: u32, output: bool) -> Result<i32, Error> {
+    fn init(&mut self, port: i32, pin: i32, output: bool) -> Result<i32, Error> {
         debug!("Configuring GPIO port: {} pin: {} (mode: {})", port, pin, output);
 
         let op = Kind::GpioInit{port, pin, output};

@@ -58,8 +58,8 @@ pub enum Kind {
         data_in: Vec<u8>,
     },
     GpioInit{
-        port: u32,
-        pin: u32,
+        port: i32,
+        pin: i32,
         output: bool,
     },
     GpioDeinit{
