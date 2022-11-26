@@ -6,6 +6,7 @@ use log::debug;
 
 mod spi;
 mod i2c;
+mod uart;
 mod gpio;
 
 #[derive(Clone, PartialEq, Debug)]
@@ -48,6 +49,10 @@ pub enum Kind {
     SpiDeinit{
         handle: i32,
     },
+    SpiRead{
+        handle: i32,
+        data_in: Vec<u8>,
+    },
     SpiWrite{
         handle: i32,
         data_out: Vec<u8>,
@@ -55,6 +60,25 @@ pub enum Kind {
     SpiTransfer{
         handle: i32,
         data_out: Vec<u8>,
+        data_in: Vec<u8>,
+    },
+    UartInit{
+        port: u32,
+        baud: u32,
+        tx: i32,
+        rx: i32,
+    },
+    UartDeinit{
+        handle: i32,
+    },
+    UartWrite{
+        handle: i32,
+        flags: u32,
+        data_out: Vec<u8>,
+    },
+    UartRead{
+        handle: i32,
+        flags: u32,
         data_in: Vec<u8>,
     },
     GpioInit{

@@ -1,6 +1,5 @@
 
 
-use embedded_hal::spi::blocking::Operation;
 use log::debug;
 
 use crate::api::{Spi, Error};
@@ -35,6 +34,24 @@ impl Spi for MockCtx {
         Ok(())
     }
 
+    fn read<'a>(&mut self, handle: i32, data: &mut [u8]) -> Result<(), Error> {
+        let Op{kind, ..} = &self.expected[self.index];
+
+        if let Kind::SpiRead{data_in, ..} = kind {
+            data.copy_from_slice(&data_in);
+        }
+
+        debug!("SPI write read: {} data: {:02x?}", handle, data);
+
+        let op = Kind::SpiRead{handle, data_in: data.to_vec()};
+        assert_eq!(&op, kind);
+
+        self.actual.push(op);
+        self.index += 1;
+
+        Ok(())
+    }
+
     fn write<'a>(&mut self, handle: i32, data: &[u8]) -> Result<(), Error> {
         let op = Kind::SpiWrite{handle, data_out: data.to_vec()};
         let Op{kind, ..} = &self.expected[self.index];
@@ -49,7 +66,7 @@ impl Spi for MockCtx {
         Ok(())
     }
 
-    fn transfer<'a>(&mut self, handle: i32, data: &mut [u8]) -> Result<(), Error> {
+    fn transfer_inplace<'a>(&mut self, handle: i32, data: &mut [u8]) -> Result<(), Error> {
         let Op{kind, ..} = &self.expected[self.index];
 
         let d = data.to_vec();
@@ -69,7 +86,22 @@ impl Spi for MockCtx {
         Ok(())
     }
 
-    fn exec<'a>(&mut self, _handle: i32, _ops: &[Operation<u8>]) -> Result<(), Error> {
-        todo!()
+    fn transfer<'a>(&mut self, handle: i32, read: &mut [u8], write: &[u8]) -> Result<(), Error> {
+        let Op{kind, ..} = &self.expected[self.index];
+
+        if let Kind::SpiTransfer{data_in, ..} = kind {
+            read.copy_from_slice(&data_in);
+        }
+
+        debug!("SPI transfer handle: {} write: {:02x?} read: {:02x?}", handle, write, read);
+
+        let op = Kind::SpiTransfer{handle, data_out: write.to_vec(), data_in: read.to_vec()};
+        assert_eq!(&op, kind);
+
+        self.actual.push(op);
+        self.index += 1;
+        
+        Ok(())
     }
+
 }

@@ -61,7 +61,7 @@ impl api::Spi for LinuxCtx {
         debug!("SPI write for handle: {}", handle);
 
         // Fetch spi device instance
-        let spi_dev = match self.spi.get_mut(&handle) {
+        let mut spi_dev = match self.spi.get_mut(&handle) {
             Some(d) => d,
             None => {
                 error!("No spi device for handle: {}", handle);
@@ -70,7 +70,7 @@ impl api::Spi for LinuxCtx {
         };
 
         // Perform operation
-        if let Err(e) = spi_dev.write(data) {
+        if let Err(e) = SpiBusWrite::write(&mut spi_dev, data) {
             error!("SPI write failed: {:?}", e);
             return Err(Error::Failed)
         }
@@ -78,11 +78,32 @@ impl api::Spi for LinuxCtx {
         Ok(())
     }
 
-    fn transfer<'a>(&mut self, handle: i32, data: &mut [u8]) -> Result<(), Error> {
+    fn read<'a>(&mut self, handle: i32, data: &mut [u8]) -> Result<(), Error> {
+        debug!("SPI read for handle: {}", handle);
+
+        // Fetch spi device instance
+        let mut spi_dev = match self.spi.get_mut(&handle) {
+            Some(d) => d,
+            None => {
+                error!("No spi device for handle: {}", handle);
+                return Err(Error::NoDevice)
+            }
+        };
+
+        // Perform operation
+        if let Err(e) = SpiBusRead::read(&mut spi_dev, data) {
+            error!("SPI read failed: {:?}", e);
+            return Err(Error::Failed)
+        }
+
+        Ok(())
+    }
+
+    fn transfer_inplace<'a>(&mut self, handle: i32, data: &mut [u8]) -> Result<(), Error> {
         debug!("SPI transfer for handle: {}", handle);
 
         // Fetch spi device instance
-        let spi_dev = match self.spi.get_mut(&handle) {
+        let mut spi_dev = match self.spi.get_mut(&handle) {
             Some(d) => d,
             None => {
                 error!("No spi device for handle: {}", handle);
@@ -91,7 +112,7 @@ impl api::Spi for LinuxCtx {
         };
 
         // Perform operation
-        if let Err(e) = spi_dev.write(data) {
+        if let Err(e) = SpiBus::transfer_in_place(&mut spi_dev, data) {
             error!("SPI write failed: {:?}", e);
             return Err(Error::Failed)
         }
@@ -99,7 +120,26 @@ impl api::Spi for LinuxCtx {
         Ok(())
     }
 
-    fn exec<'a>(&mut self, _handle: i32, _ops: &[Operation<u8>]) -> Result<(), Error> {
-        todo!("Work out how the h*ck to pass this over WASM boundaries")
+    fn transfer<'a>(&mut self, handle: i32, read: &mut [u8], write: &[u8]) -> Result<(), Error> {
+        debug!("SPI transfer for handle: {}", handle);
+
+        // Fetch spi device instance
+        let mut spi_dev = match self.spi.get_mut(&handle) {
+            Some(d) => d,
+            None => {
+                error!("No spi device for handle: {}", handle);
+                return Err(Error::NoDevice)
+            }
+        };
+
+        // Perform operation
+        if let Err(e) = SpiBus::transfer(&mut spi_dev, read, write) {
+            error!("SPI write failed: {:?}", e);
+            return Err(Error::Failed)
+        }
+
+        Ok(())
     }
+
+
 }

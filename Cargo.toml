@@ -3,7 +3,7 @@ name = "wasm-embedded-rt"
 description = "Runtime for embedded-wasm applications"
 repository = "https://github.com/embedded-wasm/rt"
 documentation = "https://ryan.kurte.nz/embedded-wasm"
-version = "0.3.0"
+version = "0.4.0"
 edition = "2018"
 license = "MPL-2.0"
 
@@ -27,16 +27,13 @@ hal-mock = [ "embedded-hal-mock", "std", "serde", "serde_derive", "toml" ]
 default = [ "rt", "rt-wasmtime", "rt-wasm3", "hal-linux", "hal-mock" ]
 
 [dependencies]
-embedded-hal = "1.0.0-alpha.5"
+
 log = { version = "0.4.14", default_features = false }
-wasm-embedded-spec = { version = "0.3.0", default_features = false }
 
-
-# rt-wasmtime
-wasm-embedded-rt-wasmtime = { version = "0.3.1", optional = true }
-
-# rt-wasm3
-wasm-embedded-rt-wasm3 = { version = "0.3.1", optional = true }
+# embedded-wasm components
+wasm-embedded-spec = { version = "0.4.0", default_features = false }
+wasm-embedded-rt-wasmtime = { version = "0.4.0", optional = true }
+wasm-embedded-rt-wasm3 = { version = "0.4.0", optional = true }
 
 # error handling
 thiserror = { version = "1.0.30", optional = true }
@@ -45,6 +42,7 @@ anyhow = { version = "1.0.41", optional = true }
 # serialisation
 serde = { version = "1.0.126", features = [ "derive" ], optional = true }
 serde_derive = {version = "1.0.126", optional = true }
+toml = { version = "0.5.8", optional = true }
 
 # CLI / logging / argument parsing
 structopt = { version = "0.3.25", optional = true }
@@ -52,12 +50,10 @@ strum = { version = "0.21.0", optional = true }
 strum_macros = { version = "0.21.1", optional = true }
 simplelog = { version = "0.10.0", optional = true }
 
-# hal-mock
+# HAL components
+embedded-hal = "1.0.0-alpha.8"
 embedded-hal-mock = { version = "0.7.2", optional = true }
-toml = { version = "0.5.8", optional = true }
-
-# hal-linux
-linux-embedded-hal = { version = "0.4.0-alpha.1", optional = true }
+linux-embedded-hal = { version = "0.4.0-alpha.3", optional = true }
 
 
 [[bin]]
