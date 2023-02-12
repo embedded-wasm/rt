@@ -1,5 +1,5 @@
 
-use std::format;
+use std::{format, collections::HashMap};
 
 use log::{debug, error};
 
@@ -8,10 +8,23 @@ use embedded_hal::serial::{
 };
 use linux_embedded_hal::Serial;
 
-use crate::api::{self, Error};
-use super::LinuxCtx;
+use wasm_embedded_spec::{Error, Uart};
 
-impl api::Uart for LinuxCtx {
+pub struct UartDriver {
+    count: i32,
+    uart: HashMap<i32, Serial>
+}
+
+impl UartDriver {
+    pub fn new() -> Self {
+        Self{
+            count: 0,
+            uart: HashMap::new()
+        }
+    }
+}
+
+impl Uart for UartDriver {
     fn init(&mut self, dev: u32, _baud: u32, _tx: i32, _rx: i32) -> Result<i32, Error> {
         
         // TODO: swap to string for naming... easier to reverse than otherwise

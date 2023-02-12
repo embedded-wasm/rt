@@ -1,8 +1,9 @@
 
-use structopt::StructOpt;
-use strum::VariantNames;
-use strum_macros::{Display, EnumString, EnumVariantNames};
+use clap::Parser;
+use strum::{Display, EnumString, EnumVariantNames};
 use log::{LevelFilter, debug};
+
+use wasm_embedded_rt::opts::*;
 
 #[cfg(feature="hal-mock")]
 use wasm_embedded_rt::mock::MockCtx;
@@ -17,76 +18,50 @@ use wasm_embedded_rt_wasm3::{Wasm3Runtime};
 use wasm_embedded_rt_wasmtime::{WasmtimeRuntime};
 
 
-#[derive(Clone, PartialEq, Debug, StructOpt)]
-struct Options {
+#[derive(Clone, PartialEq, Debug, Parser)]
+struct Args {
     /// Backing engine
-    #[structopt(long, default_value, possible_values=&Engine::VARIANTS)]
+    #[clap(long, value_enum)]
     engine: Engine,
 
     /// WASM Runtime
-    #[structopt(long, default_value, possible_values=&Runtime::VARIANTS)]
+    #[clap(long, value_enum)]
     runtime: Runtime,
 
     /// Optional configuration file
-    #[structopt(long)]
+    #[clap(long)]
     config: Option<String>,
 
     /// WASM binary to execute
-    #[structopt()]
+    #[clap()]
     bin: String,
 
-    #[structopt(long = "log-level", default_value = "info")]
+    #[clap(long = "log-level", default_value = "info")]
     /// Configure app logging levels (warn, info, debug, trace)
     pub log_level: LevelFilter,
 }
 
-/// Runtime engine
-#[derive(Clone, PartialEq, Debug, StructOpt)]
-#[derive(Display, EnumVariantNames, EnumString)]
-#[strum(serialize_all = "snake_case")]
-#[non_exhaustive]
-pub enum Engine {
-    /// Mock provides mocked driver testing
-    Mock,
-    /// Linux provides linux-embedded-hal backed drivers
-    Linux,
+/// Mode for runtime execution
+#[derive(Clone, PartialEq, Debug, Parser)]
+pub enum Mode {
+    /// Execute a provided WASM binary
+    Exec{
+        /// WASM binary to execute
+        #[clap()]
+        bin: String,
+    },
+    /// Start remote WASM server
+    Serve{
+        /// Port for remote server binding
+        #[clap(long, default_value = "14321")]
+        port: u16,
+    },
 }
 
-impl Default for Engine {
-    fn default() -> Self {
-        #[cfg(feature="hal-linux")]
-        return Engine::Linux;
-
-        #[cfg(not(feature="hal-linux"))]
-        return Engine::Mock;
-    }
-}
-
-#[derive(Clone, PartialEq, Debug, StructOpt)]
-#[derive(Display, EnumVariantNames, EnumString)]
-#[strum(serialize_all = "snake_case")]
-#[non_exhaustive]
-pub enum Runtime {
-    /// Wasmtime based runtime
-    Wasmtime,
-    /// Wasm3 based runtime
-    Wasm3,
-}
-
-impl Default for Runtime {
-    fn default() -> Self {
-        #[cfg(feature="rt-wasmtime")]
-        return Runtime::Wasmtime;
-
-        #[cfg(not(feature="rt-wasmtime"))]
-        return Runtime::Wasm3;
-    }
-}
-
-
-fn main() -> Result<(), anyhow::Error> {
+#[tokio::main]
+async fn main() -> Result<(), anyhow::Error> {
     // Load options
-    let opts = Options::from_args();
+    let opts = Args::parse();
 
     // Setup logging
     let log_config = simplelog::ConfigBuilder::new()

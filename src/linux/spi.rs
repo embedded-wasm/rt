@@ -1,15 +1,27 @@
-use std::format;
+use std::{format, collections::HashMap};
 
 use log::{debug, error};
 
 use embedded_hal::spi::blocking::*;
 use linux_embedded_hal::{Spidev, spidev::{SpiModeFlags, SpidevOptions}};
 
-use crate::api::{self, Error};
-use super::LinuxCtx;
+use wasm_embedded_spec::{Error, Spi};
 
+pub struct SpiDriver {
+    count: i32,
+    spi: HashMap<i32, Spidev>
+}
 
-impl api::Spi for LinuxCtx {
+impl SpiDriver {
+    pub fn new() -> Self {
+        Self{
+            count: 0,
+            spi: HashMap::new()
+        }
+    }
+}
+
+impl Spi for SpiDriver {
     fn init(&mut self, dev: u32, baud: u32, _mosi: i32, _miso: i32, _sck: i32, _cs: i32) -> Result<i32, Error> {
 
         // TODO: how to deal with subdevices here?!

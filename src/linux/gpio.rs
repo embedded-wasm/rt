@@ -1,12 +1,28 @@
+//! Linux GPIO driver implementation
+
+use std::collections::HashMap;
 
 use log::{debug, error};
 use embedded_hal::digital::{PinState, blocking::*};
 use linux_embedded_hal::{SysfsPin, sysfs_gpio::Direction};
 
-use crate::api::{Gpio, Error};
-use super::*;
+use wasm_embedded_spec::{Error, Gpio};
 
-impl Gpio for LinuxCtx {
+pub struct GpioDriver {
+    count: i32,
+    gpio: HashMap<i32, SysfsPin>
+}
+
+impl GpioDriver {
+    pub fn new() -> Self {
+        Self{
+            count: 0,
+            gpio: HashMap::new()
+        }
+    }
+}
+
+impl Gpio for GpioDriver {
     /// Initialise the provided GPIO pin in input or output mode
     fn init(&mut self, _port: i32, pin: i32, output: bool) -> Result<i32, Error> {
         

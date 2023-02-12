@@ -1,14 +1,28 @@
+//! Linux I2C driver implementation
 
-use std::format;
+use std::{format, collections::HashMap};
 
 use log::{debug, warn, error};
 use embedded_hal::i2c::blocking::*;
 use linux_embedded_hal::I2cdev;
 
-use crate::api::{self, Error};
-use super::LinuxCtx;
+use wasm_embedded_spec::{Error};
 
-impl api::I2c for LinuxCtx {
+pub struct I2cDriver {
+    count: i32,
+    i2c: HashMap<i32, I2cdev>
+}
+
+impl I2cDriver {
+    pub fn new() -> Self {
+        Self{
+            count: 0,
+            i2c: HashMap::new()
+        }
+    }
+}
+
+impl wasm_embedded_spec::I2c for I2cDriver {
     fn init(&mut self, dev: u32, _baud: u32, _sda: i32, _sck: i32) -> Result<i32, Error> {
         
         let p = format!("/dev/i2c-{}", dev);
